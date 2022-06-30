@@ -14,6 +14,8 @@ public class Simple {
             // read byte data from the Sample.json file and convert it into String
             result = new String(Files.readAllBytes(Paths.get(loc)));
             // store string data into Map by using TypeToken class
+            System.out.println(result);
+            
             Gson gson = new Gson();
             Map jsonMap = gson.fromJson(result, Map.class);
             System.out.println(jsonMap);
