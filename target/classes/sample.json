@@ -1,1 +1,2 @@
-{"good":{"morning": "world"}}
+{"employees": ["ellis", "mohan", "ram"],
+"menuItems": {"Pakora": "9.99", "samosa": "7.99"}}
