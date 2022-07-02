@@ -37,6 +37,19 @@ public class miniProj2 {
 } 
 
 class myAdapter extends TypeAdapter<HashMap<String, String>> {
+
+    private String format(List<String> myList) {
+        String myString = "";
+        for (int i = 0; i < myList.size(); i++) {
+            myString = myString + myList.get(i);
+            if (i >= 0 && i < (myList.size() - 1)) {
+                myString += ", ";
+            }
+        }
+        return myString;
+    }
+
+
     @Override
     public HashMap<String, String> read(JsonReader reader) throws IOException {
         HashMap<String, String> myMap = new HashMap<String, String>();
@@ -44,65 +57,49 @@ class myAdapter extends TypeAdapter<HashMap<String, String>> {
         String key = null;
         String value = null;
         while (reader.hasNext()) {
-            JsonToken token = reader.peek();
-            if (token.equals(JsonToken.NAME)) {
+            JsonToken nextToken = reader.peek();
+            if (nextToken.equals(JsonToken.NAME)) {
                 // get the current token
                 key = reader.nextName();
             }
+
             // everything below this point is the case where the token is a value
-            else if (token.equals(JsonToken.STRING) || token.equals(JsonToken.NUMBER)) {
+            else if (nextToken.equals(JsonToken.STRING) || nextToken.equals(JsonToken.NUMBER)) {
                 // we do the bare minimun no modification needed
                 value = reader.nextString();
             }
-            else if (token.equals(JsonToken.BEGIN_ARRAY)) {
-                // somehow get that array
-                // go through the elements of the array
-                // construct the correct string
-                // add that string the right value of the map and sip martinis
-                if (token.equals(JsonToken.BEGIN_ARRAY)) {
-                    reader.beginArray();
-                }
+            
+            
+            else if (nextToken.equals(JsonToken.BEGIN_ARRAY)) {
                 List<String> myList = new ArrayList<String>();
+                
+                // go through the elements of the array and add them to a list
+                reader.beginArray();
                 while (!reader.peek().equals(JsonToken.END_ARRAY)){
                     myList.add(reader.nextString());
                 }
-                String myString = "";
-                for (int i = 0; i < myList.size(); i++) {
-                    myString = myString + myList.get(i);
-                    if (i >= 0 && i < (myList.size() - 1)) {
-                        myString += ", ";
-                    }
-                }
-                if (reader.peek().equals(JsonToken.END_ARRAY)) {
-                    reader.endArray();
-                }
-                value = myString;
-            } else if (token.equals(JsonToken.BEGIN_OBJECT)) {
+                reader.endArray();
+
+                // construct the correct string from the list of elements and set it value
+                value = format(myList);
+            } else if (nextToken.equals(JsonToken.BEGIN_OBJECT)) {
+                List<String> myList = new ArrayList<String>();
+
                 // we be reading a dictionary
                 reader.beginObject();
-                List<String> myList = new ArrayList<String>();
                 while (!reader.peek().equals(JsonToken.END_OBJECT)){
                     String valueKey = reader.nextName().toString();
                     String valueValue = reader.nextString();
                     myList.add(valueKey + ": " + valueValue);
                 }
-                String myString = "";
-                for (int i = 0; i < myList.size(); i++) {
-                    myString = myString + myList.get(i);
-                    if (i >= 0 && i < (myList.size() - 1)) {
-                        myString += ", ";
-                    }
-                }
-                if (reader.peek().equals(JsonToken.END_OBJECT)) {
-                    reader.endObject();
-                }
-                value = myString;
+                reader.endObject();
+
+                value = format(myList);
             }
 
             myMap.put(key, value);
         }
-        if (reader.peek().equals(JsonToken.END_OBJECT)) {
-            reader.endObject();}
+        reader.endObject();
         return myMap;
     }
 
